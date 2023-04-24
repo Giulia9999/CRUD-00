@@ -2,7 +2,6 @@ package com.example.crud_00;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,12 +31,16 @@ public class CarController {
     }
 
     @PutMapping("/{id}")
-    public Car updateCar(@PathVariable int id, @RequestParam String modelName, Car car){
-        if(!carRepository.existsById(id)){
-            return car;
+    public Optional<Car> updateCar(@PathVariable int id, @RequestParam String type){
+        Optional<Car> optionalCar = carRepository.findById(id);
+        if (optionalCar.isPresent()) {
+            Car car = optionalCar.get();
+            car.setType(type);
+            Car updatedCar = carRepository.save(car);
+            return Optional.of(updatedCar);
+        } else {
+            return Optional.empty();
         }
-        car.setModelName(modelName);
-        return carRepository.save(car);
     }
 
     @DeleteMapping("/{id}")
